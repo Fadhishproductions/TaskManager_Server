@@ -1,6 +1,8 @@
 const Task = require('../Models/taskModel');
-const asyncHandler = require("express-async-handler")
-const {io} = require('../Utils/socketServer')
+const asyncHandler = require("express-async-handler");
+const {  getIO } = require('../Utils/socketServer');
+
+
 // Get all tasks for a user
 const getTasks = asyncHandler(async (req, res) => {
   const { status } = req.query;
@@ -58,6 +60,7 @@ const getTasks = asyncHandler(async (req, res) => {
     });
   
     await task.save();
+    let io = getIO()
     io.to(req.user._id.toString()).emit('taskCreated', task);
 
     res.status(201).json(task);
@@ -98,6 +101,7 @@ const getTasks = asyncHandler(async (req, res) => {
     task.dueDate = dueDate ? new Date(dueDate) : task.dueDate;
   
     await task.save();
+    let io = getIO()
     io.to(req.user._id.toString()).emit('taskUpdated', task);
     res.json(task);
   });
@@ -118,6 +122,7 @@ const getTasks = asyncHandler(async (req, res) => {
       res.status(404);
       throw new Error("Task not found or unauthorized");
     }
+    let io = getIO()
     io.to(req.user._id.toString()).emit('taskDeleted', id);
     res.json({ message: "Task deleted" });
   });
@@ -135,6 +140,7 @@ const getTasks = asyncHandler(async (req, res) => {
       }
   
       // Verify if the task belongs to the authenticated user
+      
       if (task.userId.toString() !== req.user._id.toString()) {
         res.status(403);
         throw new Error('User not authorized to complete this task');
@@ -143,6 +149,7 @@ const getTasks = asyncHandler(async (req, res) => {
       // Mark the task as completed
       task.completed = true;
       await task.save();
+      let io = getIO()
       io.to(req.user._id.toString()).emit('taskCompleted', task);
       res.status(200).json({ message: 'Task marked as completed', task });
     } catch (error) {
