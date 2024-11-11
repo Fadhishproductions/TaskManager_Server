@@ -5,7 +5,6 @@ const connectDB = require('./config')
 const cookieParser = require('cookie-parser');
 const taskRoutes = require('./Routes/Tasks');
 const authRoutes = require('./Routes/Auth');
-const userRoutes = require("./routes/User");
 const { notFound, errorHandler } = require("./Middlewares/errorMiddleware");
 const { socketServer } = require("./Utils/socketServer");
 
@@ -28,7 +27,6 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/tasks", taskRoutes);
 app.use("/api/auth", authRoutes);
-app.use("/api/user", userRoutes);
 
 app.get("/", (req, res) => { res.send("Server is connected"); });
 
